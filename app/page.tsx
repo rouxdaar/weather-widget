@@ -7,6 +7,14 @@ type WeatherData = {
   time: string;
 };
 
+const raindrops = Array.from({ length: 60 }, (_, i) => ({
+  id: i,
+  left: Math.random() * 100,
+  delay: Math.random() * 2,
+  duration: 0.6 + Math.random() * 0.6,
+  opacity: 0.3 + Math.random() * 0.4,
+}));
+
 export default function Home() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [error, setError] = useState(false);
@@ -15,7 +23,7 @@ export default function Home() {
     async function fetchWeather() {
       try {
         const res = await fetch(
-          "https://api.open-meteo.com/v1/forecast?latitude=68.2&longitude=14.4&current=temperature_2m&timezone=Europe/Oslo"
+          "https://api.open-meteo.com/v1/forecast?latitude=40.68&longitude=-73.94&current=temperature_2m&timezone=America/New_York"
         );
         const data = await res.json();
         const temp = Math.round(data.current.temperature_2m);
@@ -38,6 +46,15 @@ export default function Home() {
       style={{ backgroundColor: "#18181B" }}
       className="min-h-screen flex items-center justify-center"
     >
+      <style>{`
+        @keyframes rain {
+          0% { transform: translateY(-10px); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translateY(410px); opacity: 0; }
+        }
+      `}</style>
+
       <div
         style={{
           width: 400,
@@ -51,7 +68,7 @@ export default function Home() {
         {/* Background image */}
         <img
           src="/lofoten-bg.png"
-          alt="Lofoten"
+          alt="Brooklyn"
           style={{
             position: "absolute",
             inset: 0,
@@ -60,6 +77,24 @@ export default function Home() {
             objectFit: "cover",
           }}
         />
+
+        {/* Raindrops */}
+        {raindrops.map((drop) => (
+          <div
+            key={drop.id}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: `${drop.left}%`,
+              width: 1.5,
+              height: 12,
+              backgroundColor: "rgba(255,255,255,0.6)",
+              borderRadius: 1,
+              opacity: drop.opacity,
+              animation: `rain ${drop.duration}s linear ${drop.delay}s infinite`,
+            }}
+          />
+        ))}
 
         {/* Content */}
         <div
@@ -96,8 +131,8 @@ export default function Home() {
 
           {/* Bottom left: location */}
           <div style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.4 }}>
-            <div>Lofoten</div>
-            <div>Norway</div>
+            <div>Brooklyn</div>
+            <div>New York</div>
           </div>
         </div>
       </div>
